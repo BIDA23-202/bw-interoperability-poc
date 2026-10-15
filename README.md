@@ -54,3 +54,4 @@ Then open `http://127.0.0.1:8000/docs`. Key endpoints: `POST /interop/v1/bank-to
 - The mock gateway's endpoints and statuses are modelled on public documentation and are not verified against Orange's current API.
 - The manifest and the engine share the same rules, so 408/408 shows conformance to the specification, not accuracy on real payments.
 - The wallet record cannot supply debtor name, debtor account, or the clearing reference when translated to pacs.008.
+# NB; the notebooks are written for Google Colab with files in My Drive/bw-interop-poc.
