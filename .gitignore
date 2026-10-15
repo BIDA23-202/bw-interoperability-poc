@@ -1,0 +1,7 @@
+data/MatchedPoolReference.csv
+data/*.db
+__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/
+*.pyc
+.env
