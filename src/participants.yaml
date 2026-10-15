@@ -1,0 +1,14 @@
+# participants.yaml  |  Roster for the synthetic PoC.
+# All BICs are MOCK values. The roster is illustrative: verify it against the Bank of Botswana
+# list of licensed institutions before any external use. Adding a bank = adding one line here.
+participants:
+  - {code: ABSA,           name: Absa Bank Botswana,        type: BANK,   bic: MOCKBWABXXX, active: true}
+  - {code: FNBB,           name: First National Bank Botswana, type: BANK, bic: MOCKBWFNXXX, active: true}
+  - {code: STANBIC,        name: Stanbic Bank Botswana,     type: BANK,   bic: MOCKBWSBXXX, active: true}
+  - {code: STANCHART,      name: Standard Chartered Bank Botswana, type: BANK, bic: MOCKBWSCXXX, active: true}
+  - {code: BANKGABORONE,   name: Bank Gaborone,             type: BANK,   bic: MOCKBWBGXXX, active: true}
+  - {code: BSB,            name: BSB Bank,                  type: BANK,   bic: MOCKBWBSXXX, active: true}
+  - {code: BARODA,         name: Bank of Baroda Botswana,   type: BANK,   bic: MOCKBWBRXXX, active: true}
+  - {code: ORANGE_MONEY,   name: Orange Money,              type: WALLET, bic: MOCKBWOMXXX, active: true,  note: "Web Payment API fields; mock gateway"}
+  - {code: MYZAKA,         name: MyZaka,                    type: WALLET, bic: MOCKBWMZXXX, active: false, note: "Reserved slot: no machine-readable schema"}
+  - {code: EMONEY_GENERIC, name: Generic e-money issuer,    type: WALLET, bic: MOCKBWEGXXX, active: false, note: "Illustrative adapter profile; not validated"}
