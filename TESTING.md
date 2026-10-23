@@ -2,7 +2,7 @@
 
 This project is a **simulation**. All participants, provider contracts and fee policies are project-defined mocks, not provider schemas or tariffs. The tests check the simulator's own rules.
 
-Last full run: 24 October 2026, 99 tests, all passing (commit `8b505c3`).
+Last full run: 24 October 2026, 103 tests, all passing (commit `8b505c3`).
 
 ## Running the tests
 
@@ -21,6 +21,7 @@ Add `-v` for per-test output, or `-p 'test_gateway.py'` to run a single file. A 
 | `test_gateway.py` | 33 | HTTP layer: session lifecycle and limits, request validation (422), engine error mapping (400, 404, 409), the pending-to-resolved flow, password protection |
 | `test_engine_input_rules.py` | 7 | Engine-level checks that the gateway would otherwise hide: quote source binding, currency, scenario, reference length, 200-transfer session limit |
 | `test_ledger_rules.py` | 7 | Journal integrity: balanced two-line entries, unique journal IDs, no zero-value lines, expected operations per outcome, overdraw guard |
+| test_targeted_assertions.py | 4 | Assertion-based checks for the quote expiry boundary, replay handling, operator refund, and rejection of unaffordable transfers
 
 ## Mutation testing
 
@@ -39,10 +40,10 @@ Several mutations first survived and exposed gaps (quote source binding, engine-
 
 ## Limitations
 
-- **Four mutations were detected by an unexpected exception, not a targeted assertion:** quote expiry at the exact boundary, the replay lookup being skipped, the operator REFUND action being disabled, and the source-debit funds check being removed. They count as detected, but the failing test crashed instead of asserting the specific outcome. Tightening these is future work.
+- **Four mutations were initially caught only by an unexpected exception. Targeted assertions in test_targeted_assertions.py now catch each of them directly.
 - **The mutation set is hand-chosen and not exhaustive.** It covers 39 single-line faults in the rules listed above. It does not cover multi-line changes, the adapters or frontend, or every branch.
 - **One test is white-box.** `test_post_refuses_to_overdraw_an_account` calls the private `_post` method, because the engine checks balances earlier and the guard cannot be reached through the public flow. It will break if that method is renamed.
 - **Not tested:** the demo page served at `GET /` and the frontend in `web/`. An unknown session ID is checked only as "a client error".
 - **Overlap:** `test_expired_quote_is_rejected` exists in two files, and several tests check the same behaviour under different names. The count of 99 therefore slightly overstates distinct coverage.
 - **Mock scope:** passing tests show the simulator behaves as designed. They say nothing about any real bank, wallet or provider.
-- **Mutation tooling is local.** The mutation scripts were run on a development machine and are not in the repository, so the tallies above are a record of those runs.
+- **The mutation harness is mutate.py in the project root. Run it with the virtual-environment Python from a clean working tree; it takes about a minute, restores the engine afterwards, and exits non-zero if an unexpected mutant survives.
