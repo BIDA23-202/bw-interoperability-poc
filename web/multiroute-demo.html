@@ -88,6 +88,8 @@ form .primary{width:100%;margin-top:var(--space-5)}
   padding:var(--space-5);background:var(--color-surface-2);border-radius:var(--radius-md);margin-bottom:var(--space-5)}
 .banner strong{display:block;font-size:var(--text-lg)}
 .hub{text-align:center;color:var(--color-primary);font-size:var(--text-sm);font-weight:700}
+.hub{display:flex;align-items:center;justify-content:center;gap:var(--space-2)}
+.hub::before,.hub::after{content:"";flex:none;width:28px;height:14px;background:currentColor;clip-path:polygon(0 43%,calc(100% - 12px) 43%,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,calc(100% - 12px) 57%,0 57%)}
 .result{margin-bottom:var(--space-4)}
 .badge{display:inline-block;padding:var(--space-1) var(--space-3);border-radius:999px;
   background:var(--color-surface-2);font-weight:700;font-size:var(--text-sm)}
@@ -98,6 +100,7 @@ form .primary{width:100%;margin-top:var(--space-5)}
 .events li{display:grid;grid-template-columns:32px 1fr;gap:var(--space-3);padding-block:var(--space-3);
   border-bottom:1px solid var(--color-divider);animation:enter 180ms ease-out}
 .event-number{color:var(--color-primary);font-weight:700}
+.events li:not(:has(.event-number)){display:block}
 .event-detail,.event-time{font-size:var(--text-sm);color:var(--color-text-muted)}
 .event-time{font-size:var(--text-xs)}
 .evidence{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-top:var(--space-5)}
@@ -123,6 +126,7 @@ footer{margin-top:var(--space-6);font-size:var(--text-sm);color:var(--color-text
 @keyframes enter{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 @media (max-width:950px){.layout,.evidence{grid-template-columns:1fr}.routes{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:520px){main,header{padding:var(--space-4)}.routes{grid-template-columns:1fr}.banner{grid-template-columns:1fr}.hub{text-align:left}}
+@media (max-width:520px){.hub{flex-direction:column;align-items:flex-start}.hub::before{display:none}.hub::after{width:14px;height:28px;clip-path:polygon(43% 0,43% calc(100% - 12px),0 calc(100% - 12px),50% 100%,100% calc(100% - 12px),57% calc(100% - 12px),57% 0)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
@@ -591,6 +595,13 @@ function render(data) {
   (transfer.ledger || []).forEach((entry) => {
     ledger.append(tableRow([entry.operation, entry.account, money(entry.delta_minor)], 2));
   });
+  if (!(transfer.ledger || []).length) {
+    const empty = node("tr");
+    const cell = node("td", "No ledger movements for this outcome.", "muted");
+    cell.colSpan = 3;
+    empty.append(cell);
+    ledger.append(empty);
+  }
   syncControls();
 }
 
