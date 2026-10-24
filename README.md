@@ -14,14 +14,25 @@ Two simulations of a hub that connects Botswana banks and mobile-money wallets. 
 
 ## Set up
 Python 3.9 or later for the batch pipeline. The multi-route simulation and its tests were developed and run on Python 3.12.
+```
+python -m venv .venv
+.venv\Scripts\activate          # Windows; use "source .venv/bin/activate" on macOS or Linux
+pip install -r requirements.txt
+```
 
 
 ## Multi-route simulation
 
 ### Run it
+```
+python -m uvicorn multiroute_gateway:app --app-dir src --port 8000
+```
 Then open `http://127.0.0.1:8000/` for the interface, `http://127.0.0.1:8000/docs` for the API documentation, or `http://127.0.0.1:8000/health` for a status check.
 
 To require a password, set `DEMO_PASSWORD` before starting. The server then asks for HTTP Basic credentials: any username, and the password you set. `/health` stays open.
+```
+$env:DEMO_PASSWORD = "choose-a-password"     # PowerShell
+```
 
 
 ### What it does
@@ -49,9 +60,16 @@ To require a password, set `DEMO_PASSWORD` before starting. The server then asks
 | `POST /api/demo/sessions/{session_id}/transfers/{transfer_id}/resolve` | Resolve a pending or failed transfer |
 
 ## Tests
+```
+python -m unittest discover -s tests
+```
 This runs the 107 tests for the multi-route simulation. [TESTING.md](TESTING.md) describes what each file covers, the mutation-testing results (38 of 39 injected faults detected), and the limitations. The mutation run can be repeated with `python mutate.py` on a clean working tree.
 
 The original pytest suites for the batch pipeline are in `src/`:
+```
+cd src
+python -m pytest -q
+```
 `test_mock_gateway_api.py` is skipped when FastAPI is not installed.
 
 ## Batch pipeline
@@ -75,11 +93,19 @@ The original pytest suites for the batch pipeline are in `src/`:
 | `test_*.py` | pytest suites for the batch pipeline |
 
 ### Run the batch pipeline
+```
+python src/patch_v1_1.py --src src        # once
+python -m pytest -q                        # from the src folder
+python src/run_all.py --base . --pool data/MatchedPoolReference.csv
+```
 Expected for the default `--n 400 --seed 42`: pacs.008 402 in / 382 mapped / 20 rejected, Orange 394 / 394 / 0,
 reconciliation 352 matched / 24 discrepant / 24 unmatched, 704 balanced ledger entries, manifest 408/408,
 round trip 776/776 identical, translation 352/352 in both directions, and `ALL CHECKS PASSED`.
 
 ### Run the mock gateway
+```
+python -m uvicorn mock_gateway:app --app-dir src --port 8001
+```
 Then open `http://127.0.0.1:8001/docs`. (Port 8001 avoids a clash with the multi-route simulation on 8000.) Key endpoints: `POST /interop/v1/bank-to-wallet?simulate=SUCCESS|FAILED|CANCELLED|PENDING`,
 `GET /interop/v1/payments/{end_to_end_id}`, and the wallet side `POST /oauth/v3/token`, `POST /orange-money-webpay/dev/v1/webpayment`,
 `POST /orange-money-webpay/dev/v1/transactionstatus`, `POST /mock/customer/pay/{pay_token}`. State is in memory; `POST /mock/reset` clears it.
