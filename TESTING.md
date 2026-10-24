@@ -10,19 +10,19 @@ Last full run: 24 October 2026. 107 tests, all passing.
 .\.venv-multiroute\Scripts\python.exe -m unittest discover -s tests
 ```
 
-Add `-v` for per-test output, or `-p 'test_gateway.py'` to run a single file. A `StarletteDeprecationWarning` about `httpx` appears during the gateway tests. It is a warning only and does not affect results.
+Add `-v` for per-test output, or `-p 'test_gateway.py'` to run a single file. A `StarletteDeprecationWarning` about `httpx` appears during the gateway and page tests. It is a warning only and does not affect results.
 
 ## What each test file covers
 
 | File | Tests | Covers |
-|---|---|--|
+|---|---|---|
 | `test_multiroute_core.py` | 22 | Route support for every participant pair against the registry, quote requirement, duplicate and conflicting references, concurrency, session isolation, pending and failure scenarios |
 | `test_fee_rules.py`, `test_fee_failure_paths.py`, `test_quote_rules.py` | 30 | Fee arithmetic (half-up rounding, minimum, cap), fee flow on every route type, refunds on failure, quote single use, expiry, binding to route and amount |
 | `test_gateway.py` | 33 | HTTP layer: session lifecycle and limits, request validation (422), engine error mapping (400, 404, 409), the pending-to-resolved flow, password protection |
 | `test_engine_input_rules.py` | 7 | Engine-level checks the gateway would otherwise hide: quote source binding, currency, scenario, reference length, 200-transfer session limit |
 | `test_ledger_rules.py` | 7 | Journal integrity: balanced two-line entries, unique journal IDs, no zero-value lines, expected operations per outcome, overdraw guard |
 | `test_targeted_assertions.py` | 4 | Assertion-based checks for the quote expiry boundary, replay handling, operator refund, and rejection of unaffordable transfers |
-`test_frontend_page.py` | 4 |  |
+| `test_frontend_page.py` | 4 | String-level checks on the served demo page: served as HTML, document complete, quote flow referenced (`/quotes`, `quote_id`, `/advance`, `/resolve`), every element ID the script looks up exists |
 
 ## Mutation testing
 
@@ -52,6 +52,7 @@ git status --short -- src
 
 - **The mutation set is hand-chosen and not exhaustive.** It covers 39 single-line faults in the rules listed above. It does not cover multi-line changes, the adapters, or the frontend.
 - **One test is white-box.** `test_post_refuses_to_overdraw_an_account` calls the private `_post` method, because the engine checks balances earlier and the guard cannot be reached through the public flow. It will break if that method is renamed.
-- **The page has string-level smoke tests.** the demo page served at `GET /` and the frontend in `web/`.
-- **Overlap:** `test_expired_quote_is_rejected` exists in two files, and several tests check the same behaviour under different names. The count of 103 therefore slightly overstates distinct coverage.
+- **The demo page has string-level checks only.** `test_frontend_page.py` confirms the served HTML is complete and references the quote flow, but nothing runs the page's JavaScript or checks its layout. Rendering and behaviour were checked by hand in a browser, not by browser automation. The element-ID check recognises only the `$("#id")` lookup style.
+- **Unknown session IDs** are checked only as "a client error", not for an exact status code.
+- **Overlap:** `test_expired_quote_is_rejected` exists in two files, and several tests check the same behaviour under different names. The count of 107 therefore slightly overstates distinct coverage.
 - **Mock scope:** passing tests show the simulator behaves as designed. They say nothing about any real bank, wallet or provider.
